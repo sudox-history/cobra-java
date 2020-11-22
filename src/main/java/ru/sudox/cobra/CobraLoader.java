@@ -1,12 +1,23 @@
 package ru.sudox.cobra;
 
-public class CobraLoader {
+public final class CobraLoader {
 
-    public static void load() {
+    private final static long pointer;
+
+    static {
+        loadLibrary();
+
+        // Cache all functions & callbacks ...
+        pointer = loadNative();
+    }
+
+    public static void loadLibrary() {
         try {
             System.load("C:\\Users\\Kotlinovsky\\Projects\\cobra-java\\src\\main\\jni\\cmake-build-debug\\cobra_java.dll");
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
+    private static native long loadNative();
 }

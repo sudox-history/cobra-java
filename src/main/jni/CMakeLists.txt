@@ -7,7 +7,7 @@ set(CMAKE_C_STANDARD 11)
 add_subdirectory(deps/libcobra)
 
 # bindings
-add_library(cobra_java SHARED src/socket.c)
+add_library(cobra_java SHARED src/jsocket.c src/jsocket.h src/jserver.c src/jloader.c src/jloader.h)
 target_link_libraries(cobra_java cobra_a)
 
 if (NOT ANDROID)

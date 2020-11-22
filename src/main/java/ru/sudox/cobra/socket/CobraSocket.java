@@ -9,22 +9,22 @@ import static ru.sudox.cobra.socket.CobraSocketErrors.*;
 
 public final class CobraSocket {
 
-    private static boolean isLoaded = false;
-
     private final long pointer;
     private final int writeQueueSize;
     private CobraSocketListener listener;
 
     public CobraSocket(int writeQueueSize) {
-        if (!isLoaded) {
-            CobraLoader.load();
-            load();
-
-            isLoaded = true;
-        }
-
         this.writeQueueSize = writeQueueSize;
         this.pointer = create(writeQueueSize);
+    }
+
+    private CobraSocket(long pointer, int writeQueueSize) {
+        this.writeQueueSize = writeQueueSize;
+        this.pointer = pointer;
+    }
+
+    static {
+        CobraLoader.loadLibrary();
     }
 
     public void connect(String host, String port) throws CobraSocketAlreadyConnectedException, CobraSocketUnhandledException {
@@ -96,8 +96,6 @@ public final class CobraSocket {
     protected void finalize() {
         destroy(pointer);
     }
-
-    private static native void load();
 
     private static native long create(int writeQueueSize);
 
