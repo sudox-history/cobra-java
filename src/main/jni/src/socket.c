@@ -40,6 +40,9 @@ void on_socket_drain(cobra_socket_t *socket) {
     uv_sem_post(bindings_data->sem);
 }
 
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
+
 JNIEXPORT void
 JNICALL Java_ru_sudox_cobra_socket_CobraSocket_load(JNIEnv *env, jclass class) {
     on_connect_method_id = (*env)->GetMethodID(env, class, "onConnect", "()V");
@@ -84,6 +87,10 @@ JNICALL Java_ru_sudox_cobra_socket_CobraSocket_connect(JNIEnv *env, jobject obje
     char *port_chars = (char *) (*env)->GetStringUTFChars(env, port, NULL);
     int status = cobra_socket_connect(socket, host_chars, port_chars);
 
+    if (status == COBRA_SOCKET_ERR_ALREADY_CONNECTED) {
+        (*env)->DeleteGlobalRef(env, bindings_data->ref);
+    }
+
     (*env)->ReleaseStringUTFChars(env, host, host_chars);
     (*env)->ReleaseStringUTFChars(env, port, port_chars);
 
@@ -124,3 +131,5 @@ JNICALL Java_ru_sudox_cobra_socket_CobraSocket_destroy(JNIEnv *env, jclass class
     cobra_socket_destroy(socket);
     free(bindings_data);
 }
+
+#pragma clang diagnostic pop
