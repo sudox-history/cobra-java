@@ -3,7 +3,6 @@ package ru.sudox.cobra.socket;
 import ru.sudox.cobra.CobraLoader;
 import ru.sudox.cobra.socket.exceptions.*;
 
-import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
 
 import static ru.sudox.cobra.socket.CobraSocketErrors.*;
