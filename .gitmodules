@@ -1,0 +1,3 @@
+[submodule "src/main/jni/deps/libcobra"]
+	path = src/main/jni/deps/libcobra
+	url = https://github.com/sudox-team/libcobra.git
