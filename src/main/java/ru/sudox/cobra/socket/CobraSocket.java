@@ -15,7 +15,7 @@ public final class CobraSocket {
 
     public CobraSocket(int writeQueueSize) {
         this.writeQueueSize = writeQueueSize;
-        this.pointer = create(writeQueueSize);
+        this.pointer = create(CobraLoader.getPointer(), writeQueueSize);
     }
 
     private CobraSocket(long pointer, int writeQueueSize) {
@@ -97,7 +97,7 @@ public final class CobraSocket {
         destroy(pointer);
     }
 
-    private static native long create(int writeQueueSize);
+    private static native long create(long loaderPointer, int writeQueueSize);
 
     private static native int send(long pointer, ByteBuffer buffer);
 

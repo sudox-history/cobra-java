@@ -3,20 +3,29 @@
 #include <stdlib.h>
 #include <uv.h>
 
+#include "jloader.h"
 #include "jsocket.h"
-
-static jmethodID on_connect_method_id;
-static jmethodID on_close_method_id;
-static jmethodID on_data_method_id;
 
 void on_socket_connect(cobra_socket_t *socket) {
     sock_bind_data *bind_data = (sock_bind_data *) cobra_socket_get_data(socket);
-    (*bind_data->env)->CallVoidMethod(bind_data->env, bind_data->ref, on_connect_method_id);
+
+    (*bind_data->env)->CallVoidMethod(
+            bind_data->env,
+            bind_data->ref,
+            bind_data->loader_data->on_connect_method_id
+    );
 }
 
 void on_socket_close(cobra_socket_t *socket, int error) {
     sock_bind_data *bind_data = (sock_bind_data *) cobra_socket_get_data(socket);
-    (*bind_data->env)->CallVoidMethod(bind_data->env, bind_data->ref, on_close_method_id, error);
+
+    (*bind_data->env)->CallVoidMethod(
+            bind_data->env,
+            bind_data->ref,
+            bind_data->loader_data->on_close_method_id,
+            error
+    );
+
     (*bind_data->env)->DeleteGlobalRef(bind_data->env, bind_data->ref);
 }
 
@@ -27,7 +36,13 @@ void on_socket_alloc(cobra_socket_t *socket, uint8_t **data, uint64_t length) {
 void on_socket_data(cobra_socket_t *socket, uint8_t *data, uint64_t length) {
     sock_bind_data *bind_data = (sock_bind_data *) cobra_socket_get_data(socket);
     jobject buffer_obj = (*bind_data->env)->NewDirectByteBuffer(bind_data->env, data, length);
-    (*bind_data->env)->CallVoidMethod(bind_data->env, bind_data->ref, on_data_method_id, buffer_obj);
+
+    (*bind_data->env)->CallVoidMethod(
+            bind_data->env,
+            bind_data->ref,
+            bind_data->loader_data->on_data_method_id,
+            buffer_obj
+    );
 }
 
 void on_socket_drain(cobra_socket_t *socket) {
@@ -35,8 +50,10 @@ void on_socket_drain(cobra_socket_t *socket) {
     uv_sem_post(bind_data->sem);
 }
 
-void init_cobra_socket(cobra_socket_t *socket) {
+void init_cobra_socket(cobra_socket_t *socket, jloader_data *loader_data) {
     sock_bind_data *bind_data = malloc(sizeof(sock_bind_data));
+
+    bind_data->loader_data = loader_data;
     bind_data->sem = malloc(sizeof(uv_sem_t));
     uv_sem_init(bind_data->sem, 1);
 
@@ -56,22 +73,13 @@ void link_cobra_socket(JNIEnv *env, jobject object, sock_bind_data *bind_data) {
     bind_data->env = env;
 }
 
-#pragma clang diagnostic push
-#pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
-
 JNIEXPORT jlong
-JNICALL Java_ru_sudox_cobra_socket_CobraSocket_create(JNIEnv *env, jclass class, jint write_queue_size) {
+JNICALL Java_ru_sudox_cobra_socket_CobraSocket_create(JNIEnv *env, jclass class, jlong loader_pointer,
+                                                      jint write_queue_size) {
+
     cobra_socket_t *socket = cobra_socket_create(write_queue_size);
-
-    // TODO: Move to global loader
-
-    if (on_connect_method_id == NULL) {
-        on_connect_method_id = (*env)->GetMethodID(env, class, "onConnect", "()V");
-        on_close_method_id = (*env)->GetMethodID(env, class, "onClose", "(I)V");
-        on_data_method_id = (*env)->GetMethodID(env, class, "onData", "(Ljava/nio/ByteBuffer;)V");
-    }
-
-    init_cobra_socket(socket);
+    jloader_data *loader_data = (jloader_data *) loader_pointer;
+    init_cobra_socket(socket, loader_data);
 
     return (jlong) socket;
 }
@@ -133,5 +141,3 @@ JNICALL Java_ru_sudox_cobra_socket_CobraSocket_destroy(JNIEnv *env, jclass class
     cobra_socket_destroy(socket);
     free(bind_data);
 }
-
-#pragma clang diagnostic pop

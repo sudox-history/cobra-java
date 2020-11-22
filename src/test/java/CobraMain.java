@@ -1,8 +1,8 @@
-import ru.sudox.cobra.server.CobraServer;
+import ru.sudox.cobra.socket.CobraSocket;
 
 public class CobraMain {
 
     public static void main(String[] args) {
-        CobraServer server = new CobraServer(65535);
+        CobraSocket socket = new CobraSocket(65535);
     }
 }

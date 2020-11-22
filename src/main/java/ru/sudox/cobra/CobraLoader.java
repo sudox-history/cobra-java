@@ -19,5 +19,9 @@ public final class CobraLoader {
         }
     }
 
+    public static long getPointer() {
+        return pointer;
+    }
+
     private static native long loadNative();
 }
