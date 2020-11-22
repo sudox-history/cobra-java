@@ -6,11 +6,12 @@ typedef struct socket_bindings_data sock_bind_data;
 struct socket_bindings_data {
     jobject ref;
     uv_sem_t *sem;
-    struct jloader_data *loader_data;
+    jloader_data *loader_data;
+    char *text;
     JNIEnv *env;
 };
 
-void init_cobra_socket(cobra_socket_t *socket, struct jloader_data *loader_data);
+void init_cobra_socket(cobra_socket_t *socket, jloader_data *loader_data);
 
 void link_cobra_socket(JNIEnv *env, jobject object, sock_bind_data *bind_data);
 

@@ -37,11 +37,7 @@ public final class CobraSocket {
         }
     }
 
-    public void send(ByteBuffer buffer) throws CobraSocketNotConnectedException, CobraSocketUnhandledException, CobraSocketQueueOverflowException {
-        if (buffer.capacity() > writeQueueSize) {
-            throw new CobraSocketQueueOverflowException();
-        }
-
+    public void send(ByteBuffer buffer) throws CobraSocketNotConnectedException, CobraSocketUnhandledException {
         int status = send(pointer, buffer);
 
         if (status == NOT_CONNECTED_ERROR) {

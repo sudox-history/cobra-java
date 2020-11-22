@@ -55,7 +55,7 @@ void init_cobra_socket(cobra_socket_t *socket, jloader_data *loader_data) {
 
     bind_data->loader_data = loader_data;
     bind_data->sem = malloc(sizeof(uv_sem_t));
-    uv_sem_init(bind_data->sem, 1);
+    uv_sem_init(bind_data->sem, 0);
 
     cobra_socket_set_data(socket, bind_data);
     cobra_socket_set_callbacks(
@@ -69,6 +69,7 @@ void init_cobra_socket(cobra_socket_t *socket, jloader_data *loader_data) {
 }
 
 void link_cobra_socket(JNIEnv *env, jobject object, sock_bind_data *bind_data) {
+    bind_data->text = "SUKA";
     bind_data->ref = (*env)->NewGlobalRef(env, object);
     bind_data->env = env;
 }
@@ -118,7 +119,7 @@ JNICALL Java_ru_sudox_cobra_socket_CobraSocket_send(JNIEnv *env, jclass class, j
     while (1) {
         int status = cobra_socket_send(socket, address, buffer_length);
 
-        if (status == COBRA_SOCKET_ERR_QUEUE_OVERFLOW) {
+        if (status == COBRA_SOCKET_ERR_QUEUE_FULL || status == COBRA_SOCKET_ERR_QUEUE_OVERFLOW) {
             uv_sem_wait(bind_data->sem);
             continue;
         }
