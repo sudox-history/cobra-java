@@ -69,7 +69,6 @@ void init_cobra_socket(cobra_socket_t *socket, jloader_data *loader_data) {
 }
 
 void link_cobra_socket(JNIEnv *env, jobject object, sock_bind_data *bind_data) {
-    bind_data->text = "SUKA";
     bind_data->ref = (*env)->NewGlobalRef(env, object);
     bind_data->env = env;
 }
@@ -98,7 +97,7 @@ JNICALL Java_ru_sudox_cobra_socket_CobraSocket_connect(JNIEnv *env, jobject obje
     char *port_chars = (char *) (*env)->GetStringUTFChars(env, port, NULL);
     int status = cobra_socket_connect(socket, host_chars, port_chars);
 
-    if (status == COBRA_SOCKET_ERR_ALREADY_CONNECTED) {
+    if (status != COBRA_SOCKET_OK) {
         (*env)->DeleteGlobalRef(env, bind_data->ref);
     }
 

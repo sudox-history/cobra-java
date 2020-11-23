@@ -7,5 +7,6 @@ import java.nio.ByteBuffer;
 public interface CobraServerListener {
     void onConnectionOpen(CobraSocket socket);
     void onConnectionData(CobraSocket socket, ByteBuffer buffer);
-    void onConnectionClose(CobraSocket socket);
+    void onConnectionClose(CobraSocket socket, Exception exception);
+    void onServerClose(Exception exception);
 }

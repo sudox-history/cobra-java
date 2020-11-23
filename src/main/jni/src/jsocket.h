@@ -7,7 +7,6 @@ struct socket_bindings_data {
     jobject ref;
     uv_sem_t *sem;
     jloader_data *loader_data;
-    char *text;
     JNIEnv *env;
 };
 

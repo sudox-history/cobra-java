@@ -10,16 +10,13 @@ import static ru.sudox.cobra.socket.CobraSocketErrors.*;
 public final class CobraSocket {
 
     private final long pointer;
-    private final int writeQueueSize;
     private CobraSocketListener listener;
 
     public CobraSocket(int writeQueueSize) {
-        this.writeQueueSize = writeQueueSize;
         this.pointer = create(CobraLoader.getPointer(), writeQueueSize);
     }
 
-    private CobraSocket(long pointer, int writeQueueSize) {
-        this.writeQueueSize = writeQueueSize;
+    private CobraSocket(long pointer) {
         this.pointer = pointer;
     }
 

@@ -1,8 +1,6 @@
 import ru.sudox.cobra.socket.CobraSocket;
 import ru.sudox.cobra.socket.CobraSocketListener;
 import ru.sudox.cobra.socket.exceptions.CobraSocketAlreadyConnectedException;
-import ru.sudox.cobra.socket.exceptions.CobraSocketNotConnectedException;
-import ru.sudox.cobra.socket.exceptions.CobraSocketQueueOverflowException;
 import ru.sudox.cobra.socket.exceptions.CobraSocketUnhandledException;
 
 import java.nio.ByteBuffer;
@@ -13,22 +11,15 @@ public class CobraMain {
         CobraSocket socket = new CobraSocket(65535);
 
         socket.setListener(new CobraSocketListener() {
+            private ByteBuffer buffer = ByteBuffer.allocateDirect(65533);
+
             @Override
             public void onConnect() {
-                ByteBuffer buffer = ByteBuffer.allocateDirect(65533);
 
-                for (;;) {
-                    try {
-                        socket.send(buffer);
-                    } catch (CobraSocketNotConnectedException | CobraSocketUnhandledException e) {
-                        e.printStackTrace();
-                    }
-                }
             }
 
             @Override
             public void onData(ByteBuffer buffer) {
-
             }
 
             @Override

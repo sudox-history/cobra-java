@@ -12,12 +12,11 @@ public final class CobraServer {
     private final long pointer;
 
     public CobraServer(int writeQueueSize) {
-        this.pointer = create(writeQueueSize);
+        this.pointer = create(CobraLoader.getPointer(), writeQueueSize);
     }
 
     static {
         CobraLoader.loadLibrary();
-        init();
     }
 
     public void listen(String host, String port) throws CobraServerAlreadyListeningException, CobraServerUnhandledException {
@@ -39,13 +38,13 @@ public final class CobraServer {
     }
 
     @Override
-    protected void finalize() throws Throwable {
-        // TODO: Call destroy()
+    protected void finalize() {
+        destroy(pointer);
     }
 
-    private static native void init();
+    private static native long create(long loaderPointer, int writeQueueSize);
 
-    private static native long create(int writeQueueSize);
+    private static native void destroy(long pointer);
 
     private native int listen(long pointer, String host, String port);
 }
