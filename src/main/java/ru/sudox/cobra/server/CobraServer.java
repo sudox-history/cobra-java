@@ -34,6 +34,10 @@ public final class CobraServer implements CobraSocketListener {
 
     public void onConnectionOpen(CobraSocket socket) {
         socket.setListener(this);
+
+        if (listener != null) {
+            listener.onConnectionOpen(socket);
+        }
     }
 
     public void onServerClose(int error) {
@@ -51,9 +55,7 @@ public final class CobraServer implements CobraSocketListener {
 
     @Override
     public void onConnect(CobraSocket socket) {
-        if (listener != null) {
-            listener.onConnectionOpen(socket);
-        }
+        // Ignore
     }
 
     @Override

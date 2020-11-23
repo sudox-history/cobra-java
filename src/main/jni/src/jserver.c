@@ -67,6 +67,7 @@ JNICALL Java_ru_sudox_cobra_server_CobraServer_listen(JNIEnv *env, jobject objec
 
     char *host_chars = (char *) (*env)->GetStringUTFChars(env, host, NULL);
     char *port_chars = (char *) (*env)->GetStringUTFChars(env, port, NULL);
+
     int status = cobra_server_listen(server, host_chars, port_chars);
 
     if (status != COBRA_SERVER_OK) {
