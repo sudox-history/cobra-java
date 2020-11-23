@@ -1,15 +1,18 @@
 package ru.sudox.cobra.server;
 
 import ru.sudox.cobra.CobraLoader;
-import ru.sudox.cobra.server.exceptions.CobraServerAlreadyListeningException;
-import ru.sudox.cobra.server.exceptions.CobraServerUnhandledException;
+import ru.sudox.cobra.server.exceptions.*;
 import ru.sudox.cobra.socket.CobraSocket;
+import ru.sudox.cobra.socket.CobraSocketListener;
+
+import java.nio.ByteBuffer;
 
 import static ru.sudox.cobra.server.CobraServerErrors.*;
 
-public final class CobraServer {
+public final class CobraServer implements CobraSocketListener {
 
     private final long pointer;
+    private CobraServerListener listener;
 
     public CobraServer(int writeQueueSize) {
         this.pointer = create(CobraLoader.getPointer(), writeQueueSize);
@@ -30,11 +33,45 @@ public final class CobraServer {
     }
 
     public void onConnectionOpen(CobraSocket socket) {
-
+        socket.setListener(this);
     }
 
     public void onServerClose(int error) {
+        if (listener != null) {
+            switch (error) {
+                case OK -> listener.onServerClose(null);
+                case ALREADY_LISTENING_ERROR -> listener.onServerClose(new CobraServerAlreadyListeningException());
+                case RESOLVING_ERROR -> listener.onServerClose(new CobraServerResolvingException());
+                case BINDING_ERROR -> listener.onServerClose(new CobraServerBindingException());
+                case LISTENING_ERROR -> listener.onServerClose(new CobraServerListeningException());
+                default -> listener.onServerClose(new CobraServerUnhandledException(error));
+            }
+        }
+    }
 
+    @Override
+    public void onConnect(CobraSocket socket) {
+        if (listener != null) {
+            listener.onConnectionOpen(socket);
+        }
+    }
+
+    @Override
+    public void onData(CobraSocket socket, ByteBuffer buffer) {
+        if (listener != null) {
+            listener.onConnectionData(socket, buffer);
+        }
+    }
+
+    @Override
+    public void onClose(CobraSocket socket, Exception exception) {
+        if (listener != null) {
+            listener.onConnectionClose(socket, exception);
+        }
+    }
+
+    public void setListener(CobraServerListener listener) {
+        this.listener = listener;
     }
 
     @Override

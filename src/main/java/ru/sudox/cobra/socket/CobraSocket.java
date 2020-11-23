@@ -56,28 +56,28 @@ public final class CobraSocket {
 
     public void onConnect() {
         if (listener != null) {
-            listener.onConnect();
+            listener.onConnect(this);
         }
     }
 
     public void onClose(int reason) {
         if (listener != null) {
             switch (reason) {
-                case OK -> listener.onClose(null);
-                case ALREADY_CONNECTED_ERROR -> listener.onClose(new CobraSocketAlreadyConnectedException());
-                case NOT_CONNECTED_ERROR -> listener.onClose(new CobraSocketNotConnectedException());
-                case RESOLVING_ERROR -> listener.onClose(new CobraSocketResolvingException());
-                case CONNECTING_ERROR -> listener.onClose(new CobraSocketConnectingException());
-                case QUEUE_OVERFLOW_ERROR -> listener.onClose(new CobraSocketQueueOverflowException());
-                case WRITING_ERROR -> listener.onClose(new CobraSocketWritingException());
-                default -> listener.onClose(new CobraSocketUnhandledException(reason));
+                case OK -> listener.onClose(this, null);
+                case ALREADY_CONNECTED_ERROR -> listener.onClose(this, new CobraSocketAlreadyConnectedException());
+                case NOT_CONNECTED_ERROR -> listener.onClose(this, new CobraSocketNotConnectedException());
+                case RESOLVING_ERROR -> listener.onClose(this, new CobraSocketResolvingException());
+                case CONNECTING_ERROR -> listener.onClose(this, new CobraSocketConnectingException());
+                case QUEUE_OVERFLOW_ERROR -> listener.onClose(this, new CobraSocketQueueOverflowException());
+                case WRITING_ERROR -> listener.onClose(this, new CobraSocketWritingException());
+                default -> listener.onClose(this, new CobraSocketUnhandledException(reason));
             }
         }
     }
 
     public void onData(ByteBuffer buffer) {
         if (listener != null) {
-            listener.onData(buffer);
+            listener.onData(this, buffer);
         }
     }
 
