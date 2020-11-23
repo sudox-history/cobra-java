@@ -34,13 +34,16 @@ public final class CobraSocket {
         }
     }
 
-    public void send(ByteBuffer buffer) throws CobraSocketNotConnectedException, CobraSocketUnhandledException {
+    public void send(ByteBuffer buffer) throws CobraSocketNotConnectedException, CobraSocketUnhandledException, CobraSocketQueueOverflowException, CobraSocketWritingException {
         int status = send(pointer, buffer);
 
-        if (status == NOT_CONNECTED_ERROR) {
-            throw new CobraSocketNotConnectedException();
-        } else if (status != OK) {
-            throw new CobraSocketUnhandledException(status);
+        if (status != OK) {
+            switch (status) {
+                case NOT_CONNECTED_ERROR -> throw new CobraSocketNotConnectedException();
+                case QUEUE_OVERFLOW_ERROR -> throw new CobraSocketQueueOverflowException();
+                case WRITING_ERROR -> throw new CobraSocketWritingException();
+                default -> throw new CobraSocketUnhandledException(status);
+            }
         }
     }
 
