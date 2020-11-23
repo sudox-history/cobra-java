@@ -1,7 +1,6 @@
 #include <jni.h>
 #include <cobra.h>
 #include <stdlib.h>
-#include <uv.h>
 
 #include "jloader.h"
 #include "jsocket.h"
@@ -47,15 +46,17 @@ void on_socket_data(cobra_socket_t *socket, uint8_t *data, uint64_t length) {
 
 void on_socket_drain(cobra_socket_t *socket) {
     sock_bind_data *bind_data = (sock_bind_data *) cobra_socket_get_data(socket);
-    uv_sem_post(bind_data->sem);
+
+    (*bind_data->env)->CallVoidMethod(
+            bind_data->env,
+            bind_data->ref,
+            bind_data->loader_data->on_drain_method_id
+    );
 }
 
 void init_cobra_socket(cobra_socket_t *socket, jloader_data *loader_data) {
     sock_bind_data *bind_data = malloc(sizeof(sock_bind_data));
-
     bind_data->loader_data = loader_data;
-    bind_data->sem = malloc(sizeof(uv_sem_t));
-    uv_sem_init(bind_data->sem, 0);
 
     cobra_socket_set_data(socket, bind_data);
     cobra_socket_set_callbacks(
@@ -110,21 +111,10 @@ JNICALL Java_ru_sudox_cobra_socket_CobraSocket_connect(JNIEnv *env, jobject obje
 JNIEXPORT jint
 JNICALL Java_ru_sudox_cobra_socket_CobraSocket_send(JNIEnv *env, jclass class, jlong pointer, jobject buffer) {
     cobra_socket_t *socket = (cobra_socket_t *) pointer;
-    sock_bind_data *bind_data = (sock_bind_data *) cobra_socket_get_data(socket);
-
     int buffer_length = (*env)->GetDirectBufferCapacity(env, buffer);
     void *address = (*env)->GetDirectBufferAddress(env, buffer);
 
-    while (1) {
-        int status = cobra_socket_send(socket, address, buffer_length);
-
-        if (status == COBRA_SOCKET_ERR_QUEUE_FULL || status == COBRA_SOCKET_ERR_QUEUE_OVERFLOW) {
-            uv_sem_wait(bind_data->sem);
-            continue;
-        }
-
-        return status;
-    }
+    return cobra_socket_send(socket, address, buffer_length);
 }
 
 JNIEXPORT jint
@@ -137,7 +127,6 @@ JNICALL Java_ru_sudox_cobra_socket_CobraSocket_destroy(JNIEnv *env, jclass class
     cobra_socket_t *socket = (cobra_socket_t *) pointer;
     sock_bind_data *bind_data = (sock_bind_data *) cobra_socket_get_data(socket);
 
-    uv_sem_destroy(bind_data->sem);
     cobra_socket_destroy(socket);
     free(bind_data);
 }

@@ -75,6 +75,12 @@ public final class CobraSocket {
         }
     }
 
+    public void onDrain() {
+        if (listener != null) {
+            listener.onDrain(this);
+        }
+    }
+
     public void onData(ByteBuffer buffer) {
         if (listener != null) {
             listener.onData(this, buffer);

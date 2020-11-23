@@ -70,6 +70,13 @@ public final class CobraServer implements CobraSocketListener {
         }
     }
 
+    @Override
+    public void onDrain(CobraSocket socket) {
+        if (listener != null) {
+            listener.onConnectionDrain(socket);
+        }
+    }
+
     public void setListener(CobraServerListener listener) {
         this.listener = listener;
     }

@@ -12,6 +12,7 @@ JNICALL Java_ru_sudox_cobra_CobraLoader_loadNative(JNIEnv *env, jclass class) {
     data->on_connect_method_id = (*env)->GetMethodID(env, socket_class, "onConnect", "()V");
     data->on_close_method_id = (*env)->GetMethodID(env, socket_class, "onClose", "(I)V");
     data->on_data_method_id = (*env)->GetMethodID(env, socket_class, "onData", "(Ljava/nio/ByteBuffer;)V");
+    data->on_drain_method_id = (*env)->GetMethodID(env, socket_class, "onDrain", "()V");
 
     jclass server_class = (*env)->FindClass(env, "ru/sudox/cobra/server/CobraServer");
     data->on_server_close_method_id = (*env)->GetMethodID(env, server_class, "onServerClose", "(I)V");
