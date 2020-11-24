@@ -19,5 +19,9 @@ JNICALL Java_ru_sudox_cobra_CobraLoader_loadNative(JNIEnv *env, jclass class) {
     data->on_server_connection_method_id = (*env)->GetMethodID(env, server_class, "onConnectionOpen",
                                                                "(Lru/sudox/cobra/socket/CobraSocket;)V");
 
+    jclass discovery_class = (*env)->FindClass(env, "ru/sudox/cobra/discovery/CobraDiscovery");
+    data->on_discovery_found_method_id = (*env)->GetMethodID(env, discovery_class, "onFound", "(Ljava/lang/String;)V");
+    data->on_discovery_close_method_id = (*env)->GetMethodID(env, discovery_class, "onClose", "(I)V");
+
     return (jlong) data;
 }

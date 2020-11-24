@@ -36,19 +36,19 @@ public final class CobraServer implements CobraSocketListener {
         socket.setListener(this);
 
         if (listener != null) {
-            listener.onConnectionOpen(socket);
+            listener.onConnectionOpen(this, socket);
         }
     }
 
     public void onServerClose(int error) {
         if (listener != null) {
             switch (error) {
-                case OK -> listener.onServerClose(null);
-                case ALREADY_LISTENING_ERROR -> listener.onServerClose(new CobraServerAlreadyListeningException());
-                case RESOLVING_ERROR -> listener.onServerClose(new CobraServerResolvingException());
-                case BINDING_ERROR -> listener.onServerClose(new CobraServerBindingException());
-                case LISTENING_ERROR -> listener.onServerClose(new CobraServerListeningException());
-                default -> listener.onServerClose(new CobraServerUnhandledException(error));
+                case OK -> listener.onServerClose(this, null);
+                case ALREADY_LISTENING_ERROR -> listener.onServerClose(this, new CobraServerAlreadyListeningException());
+                case RESOLVING_ERROR -> listener.onServerClose(this, new CobraServerResolvingException());
+                case BINDING_ERROR -> listener.onServerClose(this, new CobraServerBindingException());
+                case LISTENING_ERROR -> listener.onServerClose(this, new CobraServerListeningException());
+                default -> listener.onServerClose(this, new CobraServerUnhandledException(error));
             }
         }
     }
@@ -61,21 +61,21 @@ public final class CobraServer implements CobraSocketListener {
     @Override
     public void onData(CobraSocket socket, ByteBuffer buffer) {
         if (listener != null) {
-            listener.onConnectionData(socket, buffer);
+            listener.onConnectionData(this, socket, buffer);
         }
     }
 
     @Override
     public void onClose(CobraSocket socket, Exception exception) {
         if (listener != null) {
-            listener.onConnectionClose(socket, exception);
+            listener.onConnectionClose(this, socket, exception);
         }
     }
 
     @Override
     public void onDrain(CobraSocket socket) {
         if (listener != null) {
-            listener.onConnectionDrain(socket);
+            listener.onConnectionDrain(this, socket);
         }
     }
 

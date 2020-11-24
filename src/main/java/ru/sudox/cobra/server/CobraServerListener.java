@@ -5,9 +5,13 @@ import ru.sudox.cobra.socket.CobraSocket;
 import java.nio.ByteBuffer;
 
 public interface CobraServerListener {
-    void onConnectionOpen(CobraSocket socket);
-    void onConnectionDrain(CobraSocket socket);
-    void onConnectionData(CobraSocket socket, ByteBuffer buffer);
-    void onConnectionClose(CobraSocket socket, Exception exception);
-    void onServerClose(Exception exception);
+    void onConnectionOpen(CobraServer server, CobraSocket socket);
+
+    void onConnectionDrain(CobraServer server, CobraSocket socket);
+
+    void onConnectionData(CobraServer server, CobraSocket socket, ByteBuffer buffer);
+
+    void onConnectionClose(CobraServer server, CobraSocket socket, Exception exception);
+
+    void onServerClose(CobraServer server, Exception exception);
 }

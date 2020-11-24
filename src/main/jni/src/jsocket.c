@@ -125,8 +125,6 @@ JNICALL Java_ru_sudox_cobra_socket_CobraSocket_close(JNIEnv *env, jclass class, 
 JNIEXPORT void
 JNICALL Java_ru_sudox_cobra_socket_CobraSocket_destroy(JNIEnv *env, jclass class, jlong pointer) {
     cobra_socket_t *socket = (cobra_socket_t *) pointer;
-    sock_bind_data *bind_data = (sock_bind_data *) cobra_socket_get_data(socket);
-
+    free((sock_bind_data *) cobra_socket_get_data(socket));
     cobra_socket_destroy(socket);
-    free(bind_data);
 }
