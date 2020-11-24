@@ -32,10 +32,14 @@ public final class CobraServer implements CobraSocketListener {
         }
     }
 
-    public void close() {
+    public void close() throws CobraServerAlreadyListeningException, CobraServerUnhandledException {
         int res = close(pointer);
 
-
+        if (res == ALREADY_LISTENING_ERROR) {
+            throw new CobraServerAlreadyListeningException();
+        } else if (res != OK) {
+            throw new CobraServerUnhandledException(res);
+        }
     }
 
     public void onConnectionOpen(CobraSocket socket) {
