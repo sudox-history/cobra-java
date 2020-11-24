@@ -26,6 +26,8 @@ void discovery_on_close(cobra_discovery_t *discovery, int error) {
             dsc_data->loader_data->on_discovery_close_method_id,
             error
     );
+
+    (*dsc_data->env)->DeleteGlobalRef(dsc_data->env, dsc_data->ref);
 }
 
 disc_data *prepare_discovery(JNIEnv *env, jobject object, cobra_discovery_t *discovery) {
