@@ -86,3 +86,8 @@ JNICALL Java_ru_sudox_cobra_server_CobraServer_destroy(JNIEnv *env, jclass class
     free(cobra_server_get_data(server));
     cobra_server_destroy(server);
 }
+
+JNIEXPORT jint
+JNICALL Java_ru_sudox_cobra_server_CobraServer_close(JNIEnv *env, jlong pointer) {
+    return cobra_server_close((cobra_server_t *) pointer);
+}

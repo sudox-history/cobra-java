@@ -32,6 +32,12 @@ public final class CobraServer implements CobraSocketListener {
         }
     }
 
+    public void close() {
+        int res = close(pointer);
+
+
+    }
+
     public void onConnectionOpen(CobraSocket socket) {
         socket.setListener(this);
 
@@ -93,4 +99,6 @@ public final class CobraServer implements CobraSocketListener {
     private static native void destroy(long pointer);
 
     private native int listen(long pointer, String host, String port);
+
+    private native int close(long pointer);
 }
