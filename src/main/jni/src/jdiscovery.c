@@ -18,6 +18,14 @@ void discovery_on_found(cobra_discovery_t *discovery, char *host) {
 }
 
 void discovery_on_close(cobra_discovery_t *discovery, int error) {
+    disc_data *dsc_data = (disc_data *) cobra_discovery_get_data(discovery);
+
+    (*dsc_data->env)->CallVoidMethod(
+            dsc_data->env,
+            dsc_data->ref,
+            dsc_data->loader_data->on_discovery_close_method_id,
+            error
+    );
 }
 
 disc_data *prepare_discovery(JNIEnv *env, jobject object, cobra_discovery_t *discovery) {
