@@ -1,22 +1,28 @@
 package ru.sudox.cobra;
 
+import ru.sudox.cobra.enviroment.CobraEnvironment;
+
 public final class CobraLoader {
 
-    private final static long pointer;
+    private static long pointer;
+    private static CobraEnvironment environment;
 
-    static {
-        loadLibrary();
+    public static void init(CobraEnvironment env) {
+        if (environment == null) {
+            environment = env;
+            environment.load();
 
-        // Cache all functions & callbacks ...
-        pointer = loadNative();
+            // Cache all functions & callbacks ...
+            pointer = loadNative();
+        }
     }
 
-    public static void loadLibrary() {
-        try {
-            System.load("C:\\Users\\Kotlinovsky\\Projects\\cobra-java\\src\\main\\jni\\cmake-build-debug\\cobra_java.dll");
-        } catch (Exception e) {
-            e.printStackTrace();
+    public static void loadInternal() {
+        if (environment == null) {
+            throw new IllegalStateException("Environment not initialized.");
         }
+
+        environment.load();
     }
 
     public static long getPointer() {

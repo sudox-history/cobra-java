@@ -21,7 +21,7 @@ public final class CobraSocket {
     }
 
     static {
-        CobraLoader.loadLibrary();
+        CobraLoader.loadInternal();
     }
 
     public void connect(String host, String port) throws CobraSocketAlreadyConnectedException, CobraSocketUnhandledException {

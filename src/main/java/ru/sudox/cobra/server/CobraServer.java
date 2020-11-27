@@ -19,7 +19,7 @@ public final class CobraServer implements CobraSocketListener {
     }
 
     static {
-        CobraLoader.loadLibrary();
+        CobraLoader.loadInternal();
     }
 
     public void listen(String host, String port) throws CobraServerAlreadyListeningException, CobraServerUnhandledException {

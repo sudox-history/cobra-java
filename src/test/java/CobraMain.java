@@ -1,10 +1,14 @@
+import ru.sudox.cobra.CobraLoader;
 import ru.sudox.cobra.discovery.CobraDiscovery;
 import ru.sudox.cobra.discovery.CobraDiscoveryListener;
 import ru.sudox.cobra.discovery.exceptions.*;
+import ru.sudox.cobra.enviroment.impl.CobraHotspotEnvironment;
 
 public class CobraMain {
 
     public static void main(String[] args) throws CobraDiscoveryUnhandledException, CobraDiscoveryAlreadyStartedException, CobraDiscoveryJoiningGroupException, CobraDiscoveryBindingException, CobraDiscoverySendingException {
+        CobraLoader.init(new CobraHotspotEnvironment());
+
         CobraDiscovery discovery = new CobraDiscovery();
 
         discovery.setListener(new CobraDiscoveryListener() {

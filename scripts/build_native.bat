@@ -25,9 +25,3 @@ cmake -DCMAKE_BUILD_TYPE=Release .. -A ARM64
 cmake --build . --config Release -j %NUMBER_OF_PROCESSORS%
 move /Y Release\cobra_java.dll ..\output\cobra_win_arm64.dll
 del CMakeCache.txt
-
-cd ..
-rmdir cmake-build-release
-cd ..\..\..
-
-PAUSE

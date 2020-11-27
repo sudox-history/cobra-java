@@ -1,3 +1,5 @@
+import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
+
 plugins {
     id 'java'
 }
@@ -9,6 +11,34 @@ repositories {
     mavenCentral()
 }
 
+sourceSets {
+    main {
+        java {
+            srcDir 'src'
+        }
+
+        resources {
+            srcDir 'src/main/jni/output'
+        }
+    }
+}
+
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+    compile 'org.apache.commons:commons-lang3:3.11'
+}
+
+task buildNative(type: Exec) {
+    OperatingSystem os = DefaultNativePlatform.currentOperatingSystem;
+
+    if (os.isWindows()) {
+        commandLine './scripts/build_native.bat'
+    } else if (os.isMacOsX()) {
+        // TODO: Build for mac
+    } else if (os.isLinux()) {
+        // TODO: Build for linux
+    } else if (os.isFreeBSD()) {
+        // TODO: Build for bsd
+    } else {
+        throw new IllegalArgumentException("Unsupported OS: " + os.displayName);
+    }
 }
