@@ -3,5 +3,17 @@
 .idea
 
 # Build
+CMakeFiles
 cmake-build-debug
 cmake-build-release
+CMakeCache.txt
+Makefile
+*.cmake
+*.cbp
+*.lib
+*.dll
+*.exp
+*.manifest
+*.dylib
+*.so
+*.a
