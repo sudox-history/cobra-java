@@ -23,6 +23,11 @@ sourceSets {
     }
 }
 
+compileJava {
+    sourceCompatibility = '1.8'
+    targetCompatibility = '1.8'
+}
+
 dependencies {
     compile 'org.apache.commons:commons-lang3:3.11'
     compile 'org.jetbrains:annotations:20.1.0'

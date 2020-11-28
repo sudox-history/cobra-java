@@ -87,12 +87,29 @@ public final class CobraServer implements CobraSocketListener {
     private void onServerClose(int error) {
         if (listener != null) {
             switch (error) {
-                case OK -> listener.onServerClose(this, null);
-                case ALREADY_LISTENING_ERROR -> listener.onServerClose(this, new CobraServerAlreadyListeningException());
-                case RESOLVING_ERROR -> listener.onServerClose(this, new CobraServerResolvingException());
-                case BINDING_ERROR -> listener.onServerClose(this, new CobraServerBindingException());
-                case LISTENING_ERROR -> listener.onServerClose(this, new CobraServerListeningException());
-                default -> listener.onServerClose(this, new CobraServerUnhandledException(error));
+                case OK: {
+                    listener.onServerClose(this, null);
+                    break;
+                }
+                case ALREADY_LISTENING_ERROR: {
+                    listener.onServerClose(this, new CobraServerAlreadyListeningException());
+                    break;
+                }
+                case RESOLVING_ERROR: {
+                    listener.onServerClose(this, new CobraServerResolvingException());
+                    break;
+                }
+                case BINDING_ERROR: {
+                    listener.onServerClose(this, new CobraServerBindingException());
+                    break;
+                }
+                case LISTENING_ERROR: {
+                    listener.onServerClose(this, new CobraServerListeningException());
+                    break;
+                }
+                default: {
+                    listener.onServerClose(this, new CobraServerUnhandledException(error));
+                }
             }
         }
     }

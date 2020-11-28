@@ -26,12 +26,29 @@ public final class CobraDiscovery {
     private void onClose(int error) {
         if (listener != null) {
             switch (error) {
-                case OK -> listener.onClose(this, null);
-                case ALREADY_STARTED_ERROR -> listener.onClose(this, new CobraDiscoveryAlreadyStartedException());
-                case BINDING_ERROR -> listener.onClose(this, new CobraDiscoveryBindingException());
-                case JOINING_GROUP_ERROR -> listener.onClose(this, new CobraDiscoveryJoiningGroupException());
-                case SENDING_ERROR -> listener.onClose(this, new CobraDiscoverySendingException());
-                default -> listener.onClose(this, new CobraDiscoveryUnhandledException(error));
+                case OK: {
+                    listener.onClose(this, null);
+                    break;
+                }
+                case ALREADY_STARTED_ERROR: {
+                    listener.onClose(this, new CobraDiscoveryAlreadyStartedException());
+                    break;
+                }
+                case BINDING_ERROR: {
+                    listener.onClose(this, new CobraDiscoveryBindingException());
+                    break;
+                }
+                case JOINING_GROUP_ERROR: {
+                    listener.onClose(this, new CobraDiscoveryJoiningGroupException());
+                    break;
+                }
+                case SENDING_ERROR: {
+                    listener.onClose(this, new CobraDiscoverySendingException());
+                    break;
+                }
+                default: {
+                    listener.onClose(this, new CobraDiscoveryUnhandledException(error));
+                }
             }
         }
     }
@@ -51,11 +68,11 @@ public final class CobraDiscovery {
     private void handleResult(int res) throws CobraDiscoveryAlreadyStartedException, CobraDiscoveryBindingException, CobraDiscoveryJoiningGroupException, CobraDiscoverySendingException, CobraDiscoveryUnhandledException {
         if (res != OK) {
             switch (res) {
-                case ALREADY_STARTED_ERROR -> throw new CobraDiscoveryAlreadyStartedException();
-                case BINDING_ERROR -> throw new CobraDiscoveryBindingException();
-                case JOINING_GROUP_ERROR -> throw new CobraDiscoveryJoiningGroupException();
-                case SENDING_ERROR -> throw new CobraDiscoverySendingException();
-                default -> throw new CobraDiscoveryUnhandledException(res);
+                case ALREADY_STARTED_ERROR: throw new CobraDiscoveryAlreadyStartedException();
+                case BINDING_ERROR: throw new CobraDiscoveryBindingException();
+                case JOINING_GROUP_ERROR: throw new CobraDiscoveryJoiningGroupException();
+                case SENDING_ERROR: throw new CobraDiscoverySendingException();
+                default: throw new CobraDiscoveryUnhandledException(res);
             }
         }
     }

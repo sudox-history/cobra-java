@@ -46,10 +46,10 @@ public final class CobraSocket {
 
         if (status != OK) {
             switch (status) {
-                case NOT_CONNECTED_ERROR -> throw new CobraSocketNotConnectedException();
-                case QUEUE_OVERFLOW_ERROR -> throw new CobraSocketQueueOverflowException();
-                case WRITING_ERROR -> throw new CobraSocketWritingException();
-                default -> throw new CobraSocketUnhandledException(status);
+                case NOT_CONNECTED_ERROR: throw new CobraSocketNotConnectedException();
+                case QUEUE_OVERFLOW_ERROR: throw new CobraSocketQueueOverflowException();
+                case WRITING_ERROR: throw new CobraSocketWritingException();
+                default: throw new CobraSocketUnhandledException(status);
             }
         }
     }
@@ -79,14 +79,37 @@ public final class CobraSocket {
     private void onClose(int reason) {
         if (listener != null) {
             switch (reason) {
-                case OK -> listener.onClose(this, null);
-                case ALREADY_CONNECTED_ERROR -> listener.onClose(this, new CobraSocketAlreadyConnectedException());
-                case NOT_CONNECTED_ERROR -> listener.onClose(this, new CobraSocketNotConnectedException());
-                case RESOLVING_ERROR -> listener.onClose(this, new CobraSocketResolvingException());
-                case CONNECTING_ERROR -> listener.onClose(this, new CobraSocketConnectingException());
-                case QUEUE_OVERFLOW_ERROR -> listener.onClose(this, new CobraSocketQueueOverflowException());
-                case WRITING_ERROR -> listener.onClose(this, new CobraSocketWritingException());
-                default -> listener.onClose(this, new CobraSocketUnhandledException(reason));
+                case OK: {
+                    listener.onClose(this, null);
+                    break;
+                }
+                case ALREADY_CONNECTED_ERROR: {
+                    listener.onClose(this, new CobraSocketAlreadyConnectedException());
+                    break;
+                }
+                case NOT_CONNECTED_ERROR: {
+                    listener.onClose(this, new CobraSocketNotConnectedException());
+                    break;
+                }
+                case RESOLVING_ERROR: {
+                    listener.onClose(this, new CobraSocketResolvingException());
+                    break;
+                }
+                case CONNECTING_ERROR: {
+                    listener.onClose(this, new CobraSocketConnectingException());
+                    break;
+                }
+                case QUEUE_OVERFLOW_ERROR: {
+                    listener.onClose(this, new CobraSocketQueueOverflowException());
+                    break;
+                }
+                case WRITING_ERROR: {
+                    listener.onClose(this, new CobraSocketWritingException());
+                    break;
+                }
+                default: {
+                    listener.onClose(this, new CobraSocketUnhandledException(reason));
+                }
             }
         }
     }
