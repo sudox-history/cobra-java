@@ -1,5 +1,6 @@
 package ru.sudox.cobra.discovery;
 
+import org.jetbrains.annotations.Nullable;
 import ru.sudox.cobra.CobraLoader;
 import ru.sudox.cobra.discovery.exceptions.*;
 
@@ -14,17 +15,19 @@ public final class CobraDiscovery {
         this.pointer = create(CobraLoader.getPointer());
     }
 
+    @SuppressWarnings("unused")
     private void onFound(String host) {
         if (listener != null) {
             listener.onFound(this, host);
         }
     }
 
+    @SuppressWarnings("unused")
     private void onClose(int error) {
         if (listener != null) {
             switch (error) {
                 case OK -> listener.onClose(this, null);
-                case ALREADY_STARTED_ERROR -> listener.onClose(null, new CobraDiscoveryAlreadyStartedException());
+                case ALREADY_STARTED_ERROR -> listener.onClose(this, new CobraDiscoveryAlreadyStartedException());
                 case BINDING_ERROR -> listener.onClose(this, new CobraDiscoveryBindingException());
                 case JOINING_GROUP_ERROR -> listener.onClose(this, new CobraDiscoveryJoiningGroupException());
                 case SENDING_ERROR -> listener.onClose(this, new CobraDiscoverySendingException());
@@ -57,11 +60,12 @@ public final class CobraDiscovery {
         }
     }
 
-    public void setListener(CobraDiscoveryListener listener) {
+    public void setListener(@Nullable CobraDiscoveryListener listener) {
         this.listener = listener;
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     protected void finalize() {
         destroy(pointer);
     }

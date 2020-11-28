@@ -1,5 +1,6 @@
 package ru.sudox.cobra;
 
+import org.jetbrains.annotations.NotNull;
 import ru.sudox.cobra.environment.CobraEnvironment;
 
 public final class CobraLoader {
@@ -7,7 +8,7 @@ public final class CobraLoader {
     private static long pointer;
     private static CobraEnvironment environment;
 
-    public static void init(CobraEnvironment env) {
+    public static void init(@NotNull CobraEnvironment env) {
         if (environment == null) {
             environment = env;
             environment.load();

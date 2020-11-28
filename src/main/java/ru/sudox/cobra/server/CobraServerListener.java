@@ -1,17 +1,19 @@
 package ru.sudox.cobra.server;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import ru.sudox.cobra.socket.CobraSocket;
 
 import java.nio.ByteBuffer;
 
 public interface CobraServerListener {
-    void onConnectionOpen(CobraServer server, CobraSocket socket);
+    void onConnectionOpen(@NotNull CobraServer server, @NotNull CobraSocket socket);
 
-    void onConnectionDrain(CobraServer server, CobraSocket socket);
+    void onConnectionDrain(@NotNull CobraServer server, @NotNull CobraSocket socket);
 
-    void onConnectionData(CobraServer server, CobraSocket socket, ByteBuffer buffer);
+    void onConnectionData(@NotNull CobraServer server, @NotNull CobraSocket socket, @NotNull ByteBuffer buffer);
 
-    void onConnectionClose(CobraServer server, CobraSocket socket, Exception exception);
+    void onConnectionClose(@NotNull CobraServer server, @NotNull CobraSocket socket, @Nullable Exception exception);
 
-    void onServerClose(CobraServer server, Exception exception);
+    void onServerClose(@NotNull CobraServer server, @Nullable Exception exception);
 }

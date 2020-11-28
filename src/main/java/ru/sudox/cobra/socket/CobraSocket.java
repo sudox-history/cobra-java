@@ -1,5 +1,7 @@
 package ru.sudox.cobra.socket;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import ru.sudox.cobra.CobraLoader;
 import ru.sudox.cobra.socket.exceptions.*;
 
@@ -16,6 +18,7 @@ public final class CobraSocket {
         this.pointer = create(CobraLoader.getPointer(), writeQueueSize);
     }
 
+    @SuppressWarnings("unused")
     private CobraSocket(long pointer) {
         this.pointer = pointer;
     }
@@ -24,7 +27,7 @@ public final class CobraSocket {
         CobraLoader.loadInternal();
     }
 
-    public void connect(String host, String port) throws CobraSocketAlreadyConnectedException, CobraSocketUnhandledException {
+    public void connect(@NotNull String host, @NotNull String port) throws CobraSocketAlreadyConnectedException, CobraSocketUnhandledException {
         int code = connect(pointer, host, port);
 
         if (code == ALREADY_CONNECTED_ERROR) {
@@ -34,7 +37,11 @@ public final class CobraSocket {
         }
     }
 
-    public void send(ByteBuffer buffer) throws CobraSocketNotConnectedException, CobraSocketUnhandledException, CobraSocketQueueOverflowException, CobraSocketWritingException {
+    public void send(@NotNull ByteBuffer buffer) throws CobraSocketNotConnectedException, CobraSocketUnhandledException, CobraSocketQueueOverflowException, CobraSocketWritingException {
+        if (!buffer.isDirect()) {
+            throw new IllegalArgumentException("Supported only direct ByteBuffers.");
+        }
+
         int status = send(pointer, buffer);
 
         if (status != OK) {
@@ -57,13 +64,19 @@ public final class CobraSocket {
         }
     }
 
-    public void onConnect() {
+    public void setListener(@Nullable CobraSocketListener listener) {
+        this.listener = listener;
+    }
+
+    @SuppressWarnings("unused")
+    private void onConnect() {
         if (listener != null) {
             listener.onConnect(this);
         }
     }
 
-    public void onClose(int reason) {
+    @SuppressWarnings("unused")
+    private void onClose(int reason) {
         if (listener != null) {
             switch (reason) {
                 case OK -> listener.onClose(this, null);
@@ -78,23 +91,22 @@ public final class CobraSocket {
         }
     }
 
-    public void onDrain() {
+    @SuppressWarnings("unused")
+    private void onDrain() {
         if (listener != null) {
             listener.onDrain(this);
         }
     }
 
-    public void onData(ByteBuffer buffer) {
+    @SuppressWarnings("unused")
+    private void onData(ByteBuffer buffer) {
         if (listener != null) {
             listener.onData(this, buffer);
         }
     }
 
-    public void setListener(CobraSocketListener listener) {
-        this.listener = listener;
-    }
-
     @Override
+    @SuppressWarnings("deprecation")
     protected void finalize() {
         destroy(pointer);
     }

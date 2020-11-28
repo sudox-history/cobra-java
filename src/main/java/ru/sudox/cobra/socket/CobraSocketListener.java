@@ -1,13 +1,16 @@
 package ru.sudox.cobra.socket;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.nio.ByteBuffer;
 
 public interface CobraSocketListener {
-    void onConnect(CobraSocket socket);
+    void onConnect(@NotNull CobraSocket socket);
 
-    void onData(CobraSocket socket, ByteBuffer buffer);
+    void onData(@NotNull CobraSocket socket, @NotNull ByteBuffer buffer);
 
-    void onClose(CobraSocket socket, Exception exception);
+    void onClose(@NotNull CobraSocket socket, @Nullable Exception exception);
 
-    void onDrain(CobraSocket socket);
+    void onDrain(@NotNull CobraSocket socket);
 }

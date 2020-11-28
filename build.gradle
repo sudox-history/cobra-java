@@ -25,10 +25,11 @@ sourceSets {
 
 dependencies {
     compile 'org.apache.commons:commons-lang3:3.11'
+    compile 'org.jetbrains:annotations:20.1.0'
 }
 
 task buildNative(type: Exec) {
-    OperatingSystem os = DefaultNativePlatform.currentOperatingSystem;
+    OperatingSystem os = DefaultNativePlatform.currentOperatingSystem
 
     if (os.isWindows()) {
         commandLine './scripts/build_native.bat'
@@ -39,6 +40,6 @@ task buildNative(type: Exec) {
     } else if (os.isFreeBSD()) {
         // TODO: Build for bsd
     } else {
-        throw new IllegalArgumentException("Unsupported OS: " + os.displayName);
+        throw new IllegalArgumentException("Unsupported OS: " + os.displayName)
     }
 }

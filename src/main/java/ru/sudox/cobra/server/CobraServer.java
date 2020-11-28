@@ -1,5 +1,7 @@
 package ru.sudox.cobra.server;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import ru.sudox.cobra.CobraLoader;
 import ru.sudox.cobra.server.exceptions.*;
 import ru.sudox.cobra.socket.CobraSocket;
@@ -22,7 +24,7 @@ public final class CobraServer implements CobraSocketListener {
         CobraLoader.loadInternal();
     }
 
-    public void listen(String host, String port) throws CobraServerAlreadyListeningException, CobraServerUnhandledException {
+    public void listen(@NotNull String host, @NotNull String port) throws CobraServerAlreadyListeningException, CobraServerUnhandledException {
         int result = listen(pointer, host, port);
 
         if (result == ALREADY_LISTENING_ERROR) {
@@ -42,7 +44,38 @@ public final class CobraServer implements CobraSocketListener {
         }
     }
 
-    public void onConnectionOpen(CobraSocket socket) {
+    @Override
+    public void onConnect(@NotNull CobraSocket socket) {
+        // Ignore
+    }
+
+    @Override
+    public void onData(@NotNull CobraSocket socket, @NotNull ByteBuffer buffer) {
+        if (listener != null) {
+            listener.onConnectionData(this, socket, buffer);
+        }
+    }
+
+    @Override
+    public void onClose(@NotNull CobraSocket socket, Exception exception) {
+        if (listener != null) {
+            listener.onConnectionClose(this, socket, exception);
+        }
+    }
+
+    @Override
+    public void onDrain(@NotNull CobraSocket socket) {
+        if (listener != null) {
+            listener.onConnectionDrain(this, socket);
+        }
+    }
+
+    public void setListener(@Nullable CobraServerListener listener) {
+        this.listener = listener;
+    }
+
+    @SuppressWarnings("unused")
+    private void onConnectionOpen(CobraSocket socket) {
         socket.setListener(this);
 
         if (listener != null) {
@@ -50,7 +83,8 @@ public final class CobraServer implements CobraSocketListener {
         }
     }
 
-    public void onServerClose(int error) {
+    @SuppressWarnings("unused")
+    private void onServerClose(int error) {
         if (listener != null) {
             switch (error) {
                 case OK -> listener.onServerClose(this, null);
@@ -64,36 +98,7 @@ public final class CobraServer implements CobraSocketListener {
     }
 
     @Override
-    public void onConnect(CobraSocket socket) {
-        // Ignore
-    }
-
-    @Override
-    public void onData(CobraSocket socket, ByteBuffer buffer) {
-        if (listener != null) {
-            listener.onConnectionData(this, socket, buffer);
-        }
-    }
-
-    @Override
-    public void onClose(CobraSocket socket, Exception exception) {
-        if (listener != null) {
-            listener.onConnectionClose(this, socket, exception);
-        }
-    }
-
-    @Override
-    public void onDrain(CobraSocket socket) {
-        if (listener != null) {
-            listener.onConnectionDrain(this, socket);
-        }
-    }
-
-    public void setListener(CobraServerListener listener) {
-        this.listener = listener;
-    }
-
-    @Override
+    @SuppressWarnings("deprecation")
     protected void finalize() {
         destroy(pointer);
     }
