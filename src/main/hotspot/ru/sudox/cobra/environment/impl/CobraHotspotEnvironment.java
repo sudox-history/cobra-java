@@ -1,7 +1,7 @@
-package ru.sudox.cobra.enviroment.impl;
+package ru.sudox.cobra.environment.impl;
 
 import org.apache.commons.lang3.SystemUtils;
-import ru.sudox.cobra.enviroment.CobraEnvironment;
+import ru.sudox.cobra.environment.CobraEnvironment;
 
 import java.io.*;
 import java.net.URL;

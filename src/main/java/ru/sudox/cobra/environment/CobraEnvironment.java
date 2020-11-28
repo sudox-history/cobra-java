@@ -1,4 +1,4 @@
-package ru.sudox.cobra.enviroment;
+package ru.sudox.cobra.environment;
 
 public interface CobraEnvironment {
     void load();

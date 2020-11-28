@@ -2,7 +2,7 @@ import ru.sudox.cobra.CobraLoader;
 import ru.sudox.cobra.discovery.CobraDiscovery;
 import ru.sudox.cobra.discovery.CobraDiscoveryListener;
 import ru.sudox.cobra.discovery.exceptions.*;
-import ru.sudox.cobra.enviroment.impl.CobraHotspotEnvironment;
+import ru.sudox.cobra.environment.impl.CobraHotspotEnvironment;
 
 public class CobraMain {
 

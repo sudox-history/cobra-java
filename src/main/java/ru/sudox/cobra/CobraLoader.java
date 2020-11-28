@@ -1,6 +1,6 @@
 package ru.sudox.cobra;
 
-import ru.sudox.cobra.enviroment.CobraEnvironment;
+import ru.sudox.cobra.environment.CobraEnvironment;
 
 public final class CobraLoader {
 
