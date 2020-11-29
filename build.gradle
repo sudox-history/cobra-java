@@ -4,17 +4,17 @@ plugins {
     id 'java'
 }
 
-group 'ru.sudox'
-version '1.0-SNAPSHOT'
-
 repositories {
     mavenCentral()
 }
 
+group 'ru.sudox'
+version '1.0-SNAPSHOT'
+
 sourceSets {
     main {
         java {
-            srcDirs 'src/main/java/java', 'src/main/hotspot'
+            srcDir 'src/main/hotspot'
         }
 
         resources {
@@ -28,9 +28,10 @@ compileJava {
     targetCompatibility = '1.8'
 }
 
+apply from: "common.gradle"
+
 dependencies {
     compile 'org.apache.commons:commons-lang3:3.11'
-    compile 'org.jetbrains:annotations:20.1.0'
 }
 
 task buildNative(type: Exec) {
