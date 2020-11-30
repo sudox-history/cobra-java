@@ -38,11 +38,11 @@ task buildNative(type: Exec) {
     OperatingSystem os = DefaultNativePlatform.currentOperatingSystem
 
     if (os.isWindows()) {
-        commandLine './scripts/build_native.bat'
+        commandLine './scripts/build_native_windows.bat'
     } else if (os.isMacOsX()) {
         // TODO: Build for mac
     } else if (os.isLinux()) {
-        // TODO: Build for linux
+        commandLine './scripts/build_native_linux.sh'
     } else if (os.isFreeBSD()) {
         // TODO: Build for bsd
     } else {
