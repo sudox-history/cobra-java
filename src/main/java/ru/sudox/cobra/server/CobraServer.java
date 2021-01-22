@@ -5,6 +5,7 @@ import org.jetbrains.annotations.Nullable;
 import ru.sudox.cobra.CobraLoader;
 import ru.sudox.cobra.server.exceptions.*;
 import ru.sudox.cobra.socket.CobraSocket;
+import ru.sudox.cobra.socket.CobraSocketError;
 import ru.sudox.cobra.socket.CobraSocketListener;
 
 import java.nio.ByteBuffer;
@@ -57,9 +58,9 @@ public final class CobraServer implements CobraSocketListener {
     }
 
     @Override
-    public void onClose(@NotNull CobraSocket socket, Exception exception) {
+    public void onClose(@NotNull CobraSocket socket, CobraSocketError exception) {
         if (listener != null) {
-            listener.onConnectionClose(this, socket, exception);
+//            listener.onConnectionClose(this, socket, exception);
         }
     }
 

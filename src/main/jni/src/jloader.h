@@ -14,6 +14,7 @@ struct jloader_data {
     jmethodID on_drain_method_id;
     jmethodID on_close_method_id;
     jmethodID on_data_method_id;
+    JavaVM *vm;
 };
 
 #endif //COBRA_JAVA_JLOADER_H

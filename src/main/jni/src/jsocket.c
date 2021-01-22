@@ -5,8 +5,19 @@
 #include "jloader.h"
 #include "jsocket.h"
 
+void attach_thread_if_need(const sock_bind_data *bind_data) {
+    if (bind_data->env == NULL) {
+        (*bind_data->loader_data->vm)->AttachCurrentThread(
+                bind_data->loader_data->vm,
+                (void **) &bind_data->env,
+                NULL
+        );
+    }
+}
+
 void on_socket_connect(cobra_socket_t *socket) {
     sock_bind_data *bind_data = (sock_bind_data *) cobra_socket_get_data(socket);
+    attach_thread_if_need(bind_data);
 
     (*bind_data->env)->CallVoidMethod(
             bind_data->env,
@@ -17,6 +28,7 @@ void on_socket_connect(cobra_socket_t *socket) {
 
 void on_socket_close(cobra_socket_t *socket, int error) {
     sock_bind_data *bind_data = (sock_bind_data *) cobra_socket_get_data(socket);
+    attach_thread_if_need(bind_data);
 
     (*bind_data->env)->CallVoidMethod(
             bind_data->env,
@@ -26,6 +38,8 @@ void on_socket_close(cobra_socket_t *socket, int error) {
     );
 
     (*bind_data->env)->DeleteGlobalRef(bind_data->env, bind_data->ref);
+    (*bind_data->loader_data->vm)->DetachCurrentThread(bind_data->loader_data->vm);
+    bind_data->env = NULL;
 }
 
 void on_socket_alloc(cobra_socket_t *socket, uint8_t **data, uint64_t length) {
@@ -34,18 +48,19 @@ void on_socket_alloc(cobra_socket_t *socket, uint8_t **data, uint64_t length) {
 
 void on_socket_data(cobra_socket_t *socket, uint8_t *data, uint64_t length) {
     sock_bind_data *bind_data = (sock_bind_data *) cobra_socket_get_data(socket);
-    jobject buffer_obj = (*bind_data->env)->NewDirectByteBuffer(bind_data->env, data, length);
+    attach_thread_if_need(bind_data);
 
     (*bind_data->env)->CallVoidMethod(
             bind_data->env,
             bind_data->ref,
             bind_data->loader_data->on_data_method_id,
-            buffer_obj
+            (*bind_data->env)->NewDirectByteBuffer(bind_data->env, data, length)
     );
 }
 
 void on_socket_drain(cobra_socket_t *socket) {
     sock_bind_data *bind_data = (sock_bind_data *) cobra_socket_get_data(socket);
+    attach_thread_if_need(bind_data);
 
     (*bind_data->env)->CallVoidMethod(
             bind_data->env,
@@ -54,9 +69,14 @@ void on_socket_drain(cobra_socket_t *socket) {
     );
 }
 
+void on_socket_write(cobra_socket_t *socket, uint8_t *data, uint64_t length, cobra_socket_err_t error) {
+    free(data);
+}
+
 void init_cobra_socket(cobra_socket_t *socket, jloader_data *loader_data) {
     sock_bind_data *bind_data = malloc(sizeof(sock_bind_data));
     bind_data->loader_data = loader_data;
+    bind_data->env = NULL;
 
     cobra_socket_set_data(socket, bind_data);
     cobra_socket_set_callbacks(
@@ -65,13 +85,13 @@ void init_cobra_socket(cobra_socket_t *socket, jloader_data *loader_data) {
             on_socket_close,
             on_socket_alloc,
             on_socket_data,
+            on_socket_write,
             on_socket_drain
     );
 }
 
 void link_cobra_socket(JNIEnv *env, jobject object, sock_bind_data *bind_data) {
     bind_data->ref = (*env)->NewGlobalRef(env, object);
-    bind_data->env = env;
 }
 
 JNIEXPORT jlong
@@ -114,7 +134,7 @@ JNICALL Java_ru_sudox_cobra_socket_CobraSocket_send(JNIEnv *env, jclass class, j
     int buffer_length = (*env)->GetDirectBufferCapacity(env, buffer);
     void *address = (*env)->GetDirectBufferAddress(env, buffer);
 
-    return cobra_socket_send(socket, address, buffer_length);
+    return cobra_socket_write(socket, address, buffer_length);
 }
 
 JNIEXPORT jint

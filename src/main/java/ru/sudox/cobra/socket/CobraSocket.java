@@ -3,17 +3,15 @@ package ru.sudox.cobra.socket;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.sudox.cobra.CobraLoader;
-import ru.sudox.cobra.socket.exceptions.*;
 
 import java.nio.ByteBuffer;
-
-import static ru.sudox.cobra.socket.CobraSocketErrors.*;
 
 public final class CobraSocket {
 
     private final long pointer;
     private CobraSocketListener listener;
 
+    @SuppressWarnings("unused")
     public CobraSocket(int writeQueueSize) {
         this.pointer = create(CobraLoader.getPointer(), writeQueueSize);
     }
@@ -27,41 +25,20 @@ public final class CobraSocket {
         CobraLoader.loadInternal();
     }
 
-    public void connect(@NotNull String host, @NotNull String port) throws CobraSocketAlreadyConnectedException, CobraSocketUnhandledException {
-        int code = connect(pointer, host, port);
-
-        if (code == ALREADY_CONNECTED_ERROR) {
-            throw new CobraSocketAlreadyConnectedException();
-        } else if (code != OK) {
-            throw new CobraSocketUnhandledException(code);
-        }
+    public CobraSocketError connect(@NotNull String host, @NotNull String port) {
+        return CobraSocketError.values()[connect(pointer, host, port)];
     }
 
-    public void send(@NotNull ByteBuffer buffer) throws CobraSocketNotConnectedException, CobraSocketUnhandledException, CobraSocketQueueOverflowException, CobraSocketWritingException {
+    public CobraSocketError write(@NotNull ByteBuffer buffer) {
         if (!buffer.isDirect()) {
             throw new IllegalArgumentException("Supported only direct ByteBuffers.");
         }
 
-        int status = send(pointer, buffer);
-
-        if (status != OK) {
-            switch (status) {
-                case NOT_CONNECTED_ERROR: throw new CobraSocketNotConnectedException();
-                case QUEUE_OVERFLOW_ERROR: throw new CobraSocketQueueOverflowException();
-                case WRITING_ERROR: throw new CobraSocketWritingException();
-                default: throw new CobraSocketUnhandledException(status);
-            }
-        }
+        return CobraSocketError.values()[write(pointer, buffer)];
     }
 
-    public void close() throws CobraSocketNotConnectedException, CobraSocketUnhandledException {
-        int status = close(pointer);
-
-        if (status == NOT_CONNECTED_ERROR) {
-            throw new CobraSocketNotConnectedException();
-        } else if (status != OK) {
-            throw new CobraSocketUnhandledException(status);
-        }
+    public CobraSocketError close() {
+        return CobraSocketError.values()[close(pointer)];
     }
 
     public void setListener(@Nullable CobraSocketListener listener) {
@@ -76,41 +53,9 @@ public final class CobraSocket {
     }
 
     @SuppressWarnings("unused")
-    private void onClose(int reason) {
+    public void onClose(int reason) {
         if (listener != null) {
-            switch (reason) {
-                case OK: {
-                    listener.onClose(this, null);
-                    break;
-                }
-                case ALREADY_CONNECTED_ERROR: {
-                    listener.onClose(this, new CobraSocketAlreadyConnectedException());
-                    break;
-                }
-                case NOT_CONNECTED_ERROR: {
-                    listener.onClose(this, new CobraSocketNotConnectedException());
-                    break;
-                }
-                case RESOLVING_ERROR: {
-                    listener.onClose(this, new CobraSocketResolvingException());
-                    break;
-                }
-                case CONNECTING_ERROR: {
-                    listener.onClose(this, new CobraSocketConnectingException());
-                    break;
-                }
-                case QUEUE_OVERFLOW_ERROR: {
-                    listener.onClose(this, new CobraSocketQueueOverflowException());
-                    break;
-                }
-                case WRITING_ERROR: {
-                    listener.onClose(this, new CobraSocketWritingException());
-                    break;
-                }
-                default: {
-                    listener.onClose(this, new CobraSocketUnhandledException(reason));
-                }
-            }
+            listener.onClose(this, CobraSocketError.values()[reason]);
         }
     }
 
@@ -136,7 +81,7 @@ public final class CobraSocket {
 
     private static native long create(long loaderPointer, int writeQueueSize);
 
-    private static native int send(long pointer, ByteBuffer buffer);
+    private static native int write(long pointer, ByteBuffer buffer);
 
     private static native int close(long pointer);
 

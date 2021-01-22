@@ -10,7 +10,7 @@ public interface CobraSocketListener {
 
     void onData(@NotNull CobraSocket socket, @NotNull ByteBuffer buffer);
 
-    void onClose(@NotNull CobraSocket socket, @Nullable Exception exception);
+    void onClose(@NotNull CobraSocket socket, @NotNull CobraSocketError error);
 
     void onDrain(@NotNull CobraSocket socket);
 }
