@@ -17,7 +17,7 @@ public final class CobraSocket {
     }
 
     @SuppressWarnings("unused")
-    private CobraSocket(long pointer) {
+    public CobraSocket(long pointer) {
         this.pointer = pointer;
     }
 

@@ -6,10 +6,21 @@
 #include "jserver.h"
 #include "jsocket.h"
 
+void server_attach_thread_if_need(srv_bind_data *bind_data) {
+    if (bind_data->env == NULL) {
+        (*bind_data->loader_data->vm)->AttachCurrentThread(
+                bind_data->loader_data->vm,
+                (void **) &bind_data->env,
+                NULL
+        );
+    }
+}
+
 void on_server_connection(cobra_server_t *server, cobra_socket_t *socket) {
     srv_bind_data *sv_bind_data = (srv_bind_data *) cobra_server_get_data(server);
-    init_cobra_socket(socket, sv_bind_data->loader_data);
 
+    server_attach_thread_if_need(sv_bind_data);
+    init_cobra_socket(socket, sv_bind_data->loader_data, sv_bind_data->env);
     sock_bind_data *cl_bind_data = (sock_bind_data *) cobra_socket_get_data(socket);
     jobject cl_object = (*sv_bind_data->env)->NewObject(
             sv_bind_data->env,
@@ -18,7 +29,7 @@ void on_server_connection(cobra_server_t *server, cobra_socket_t *socket) {
             (jlong) socket
     );
 
-    link_cobra_socket(sv_bind_data->env, cl_object, cl_bind_data);
+    link_cobra_socket(sv_bind_data->env, cl_object, cl_bind_data, false);
 
     (*sv_bind_data->env)->CallVoidMethod(
             sv_bind_data->env,
@@ -31,6 +42,7 @@ void on_server_connection(cobra_server_t *server, cobra_socket_t *socket) {
 void on_server_close(cobra_server_t *server, int error) {
     srv_bind_data *bind_data = (srv_bind_data *) cobra_server_get_data(server);
 
+    server_attach_thread_if_need(bind_data);
     (*bind_data->env)->CallVoidMethod(
             bind_data->env,
             bind_data->ref,
@@ -39,6 +51,8 @@ void on_server_close(cobra_server_t *server, int error) {
     );
 
     (*bind_data->env)->DeleteGlobalRef(bind_data->env, bind_data->ref);
+    (*bind_data->loader_data->vm)->DetachCurrentThread(bind_data->loader_data->vm);
+    bind_data->env = NULL;
 }
 
 JNIEXPORT jlong
@@ -48,6 +62,7 @@ JNICALL Java_ru_sudox_cobra_server_CobraServer_create(JNIEnv *env, jclass class,
     cobra_server_t *server = cobra_server_create(write_queue_size);
     srv_bind_data *bind_data = malloc(sizeof(srv_bind_data));
     bind_data->loader_data = (jloader_data *) loader_pointer;
+    bind_data->env = NULL;
 
     cobra_server_set_data(server, bind_data);
     cobra_server_set_callbacks(server, on_server_connection, on_server_close);
@@ -61,13 +76,10 @@ JNICALL Java_ru_sudox_cobra_server_CobraServer_listen(JNIEnv *env, jobject objec
 
     cobra_server_t *server = (cobra_server_t *) pointer;
     srv_bind_data *bind_data = (srv_bind_data *) cobra_server_get_data(server);
-
-    bind_data->env = env;
     bind_data->ref = (*env)->NewGlobalRef(env, object);
 
     char *host_chars = (char *) (*env)->GetStringUTFChars(env, host, NULL);
     char *port_chars = (char *) (*env)->GetStringUTFChars(env, port, NULL);
-
     int status = cobra_server_listen(server, host_chars, port_chars);
 
     if (status != COBRA_SERVER_OK) {

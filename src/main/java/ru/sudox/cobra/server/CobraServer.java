@@ -3,14 +3,11 @@ package ru.sudox.cobra.server;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.sudox.cobra.CobraLoader;
-import ru.sudox.cobra.server.exceptions.*;
 import ru.sudox.cobra.socket.CobraSocket;
 import ru.sudox.cobra.socket.CobraSocketError;
 import ru.sudox.cobra.socket.CobraSocketListener;
 
 import java.nio.ByteBuffer;
-
-import static ru.sudox.cobra.server.CobraServerErrors.*;
 
 public final class CobraServer implements CobraSocketListener {
 
@@ -25,24 +22,12 @@ public final class CobraServer implements CobraSocketListener {
         CobraLoader.loadInternal();
     }
 
-    public void listen(@NotNull String host, @NotNull String port) throws CobraServerAlreadyListeningException, CobraServerUnhandledException {
-        int result = listen(pointer, host, port);
-
-        if (result == ALREADY_LISTENING_ERROR) {
-            throw new CobraServerAlreadyListeningException();
-        } else if (result != OK) {
-            throw new CobraServerUnhandledException(result);
-        }
+    public CobraServerError listen(@NotNull String host, @NotNull String port) {
+        return CobraServerError.values()[listen(pointer, host, port)];
     }
 
-    public void close() throws CobraServerAlreadyListeningException, CobraServerUnhandledException {
-        int res = close(pointer);
-
-        if (res == ALREADY_LISTENING_ERROR) {
-            throw new CobraServerAlreadyListeningException();
-        } else if (res != OK) {
-            throw new CobraServerUnhandledException(res);
-        }
+    public CobraServerError close() {
+        return CobraServerError.values()[close(pointer)];
     }
 
     @Override
@@ -58,9 +43,9 @@ public final class CobraServer implements CobraSocketListener {
     }
 
     @Override
-    public void onClose(@NotNull CobraSocket socket, CobraSocketError exception) {
+    public void onClose(@NotNull CobraSocket socket, @NotNull CobraSocketError error) {
         if (listener != null) {
-//            listener.onConnectionClose(this, socket, exception);
+            listener.onConnectionClose(this, socket, error);
         }
     }
 
@@ -87,31 +72,7 @@ public final class CobraServer implements CobraSocketListener {
     @SuppressWarnings("unused")
     private void onServerClose(int error) {
         if (listener != null) {
-            switch (error) {
-                case OK: {
-                    listener.onServerClose(this, null);
-                    break;
-                }
-                case ALREADY_LISTENING_ERROR: {
-                    listener.onServerClose(this, new CobraServerAlreadyListeningException());
-                    break;
-                }
-                case RESOLVING_ERROR: {
-                    listener.onServerClose(this, new CobraServerResolvingException());
-                    break;
-                }
-                case BINDING_ERROR: {
-                    listener.onServerClose(this, new CobraServerBindingException());
-                    break;
-                }
-                case LISTENING_ERROR: {
-                    listener.onServerClose(this, new CobraServerListeningException());
-                    break;
-                }
-                default: {
-                    listener.onServerClose(this, new CobraServerUnhandledException(error));
-                }
-            }
+            listener.onServerClose(this, CobraServerError.values()[error]);
         }
     }
 
