@@ -2,9 +2,6 @@ package ru.sudox.cobra.discovery;
 
 import org.jetbrains.annotations.Nullable;
 import ru.sudox.cobra.CobraLoader;
-import ru.sudox.cobra.discovery.exceptions.*;
-
-import static ru.sudox.cobra.discovery.CobraDiscoveryErrors.*;
 
 public final class CobraDiscovery {
 
@@ -25,56 +22,20 @@ public final class CobraDiscovery {
     @SuppressWarnings("unused")
     private void onClose(int error) {
         if (listener != null) {
-            switch (error) {
-                case OK: {
-                    listener.onClose(this, null);
-                    break;
-                }
-                case ALREADY_STARTED_ERROR: {
-                    listener.onClose(this, new CobraDiscoveryAlreadyStartedException());
-                    break;
-                }
-                case BINDING_ERROR: {
-                    listener.onClose(this, new CobraDiscoveryBindingException());
-                    break;
-                }
-                case JOINING_GROUP_ERROR: {
-                    listener.onClose(this, new CobraDiscoveryJoiningGroupException());
-                    break;
-                }
-                case SENDING_ERROR: {
-                    listener.onClose(this, new CobraDiscoverySendingException());
-                    break;
-                }
-                default: {
-                    listener.onClose(this, new CobraDiscoveryUnhandledException(error));
-                }
-            }
+            listener.onClose(this, CobraDiscoveryError.values()[error]);
         }
     }
 
-    public void scan() throws CobraDiscoveryAlreadyStartedException, CobraDiscoveryBindingException, CobraDiscoveryJoiningGroupException, CobraDiscoverySendingException, CobraDiscoveryUnhandledException {
-        handleResult(scan(pointer));
+    public CobraDiscoveryError scan() {
+        return CobraDiscoveryError.values()[scan(pointer)];
     }
 
-    public void listen() throws CobraDiscoveryAlreadyStartedException, CobraDiscoveryBindingException, CobraDiscoveryJoiningGroupException, CobraDiscoverySendingException, CobraDiscoveryUnhandledException {
-        handleResult(listen(pointer));
+    public CobraDiscoveryError listen() {
+        return CobraDiscoveryError.values()[listen(pointer)];
     }
 
-    public void close() throws CobraDiscoveryUnhandledException, CobraDiscoveryAlreadyStartedException, CobraDiscoveryJoiningGroupException, CobraDiscoveryBindingException, CobraDiscoverySendingException {
-        handleResult(close(pointer));
-    }
-
-    private void handleResult(int res) throws CobraDiscoveryAlreadyStartedException, CobraDiscoveryBindingException, CobraDiscoveryJoiningGroupException, CobraDiscoverySendingException, CobraDiscoveryUnhandledException {
-        if (res != OK) {
-            switch (res) {
-                case ALREADY_STARTED_ERROR: throw new CobraDiscoveryAlreadyStartedException();
-                case BINDING_ERROR: throw new CobraDiscoveryBindingException();
-                case JOINING_GROUP_ERROR: throw new CobraDiscoveryJoiningGroupException();
-                case SENDING_ERROR: throw new CobraDiscoverySendingException();
-                default: throw new CobraDiscoveryUnhandledException(res);
-            }
-        }
+    public CobraDiscoveryError close() {
+        return CobraDiscoveryError.values()[close(pointer)];
     }
 
     public void setListener(@Nullable CobraDiscoveryListener listener) {

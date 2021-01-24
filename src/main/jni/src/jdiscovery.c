@@ -5,20 +5,31 @@
 #include "jloader.h"
 #include "jdiscovery.h"
 
+void discovery_attach_thread_if_need(disc_data *bind_data) {
+    if (bind_data->env == NULL) {
+        (*bind_data->loader_data->vm)->AttachCurrentThread(
+                bind_data->loader_data->vm,
+                (void **) &bind_data->env,
+                NULL
+        );
+    }
+}
+
 void discovery_on_found(cobra_discovery_t *discovery, char *host) {
     disc_data *dsc_data = (disc_data *) cobra_discovery_get_data(discovery);
-    jstring host_str = (*dsc_data->env)->NewStringUTF(dsc_data->env, host);
+    discovery_attach_thread_if_need(dsc_data);
 
     (*dsc_data->env)->CallVoidMethod(
             dsc_data->env,
             dsc_data->ref,
             dsc_data->loader_data->on_discovery_found_method_id,
-            host_str
+            (*dsc_data->env)->NewStringUTF(dsc_data->env, host)
     );
 }
 
 void discovery_on_close(cobra_discovery_t *discovery, int error) {
     disc_data *dsc_data = (disc_data *) cobra_discovery_get_data(discovery);
+    discovery_attach_thread_if_need(dsc_data);
 
     (*dsc_data->env)->CallVoidMethod(
             dsc_data->env,
@@ -28,13 +39,14 @@ void discovery_on_close(cobra_discovery_t *discovery, int error) {
     );
 
     (*dsc_data->env)->DeleteGlobalRef(dsc_data->env, dsc_data->ref);
+    (*dsc_data->loader_data->vm)->DetachCurrentThread(dsc_data->loader_data->vm);
+    dsc_data->env = NULL;
 }
 
 disc_data *prepare_discovery(JNIEnv *env, jobject object, cobra_discovery_t *discovery) {
     disc_data *dsc_data = (disc_data *) cobra_discovery_get_data(discovery);
-
     dsc_data->ref = (*env)->NewGlobalRef(env, object);
-    dsc_data->env = env;
+    dsc_data->env = NULL;
 
     return dsc_data;
 }
