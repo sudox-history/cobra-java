@@ -43,6 +43,17 @@ void discovery_on_close(cobra_discovery_t *discovery, int error) {
     dsc_data->env = NULL;
 }
 
+void discovery_on_address_found(cobra_discovery_t *discovery, char *host) {
+    finder_data *data = cobra_discovery_get_data(discovery);
+
+    (*data->env)->CallVoidMethod(
+            data->env,
+            data->ref,
+            data->loader_data->on_discovery_address_found_method_id,
+            (*data->env)->NewStringUTF(data->env, host)
+    );
+}
+
 disc_data *prepare_discovery(JNIEnv *env, jobject object, cobra_discovery_t *discovery) {
     disc_data *dsc_data = (disc_data *) cobra_discovery_get_data(discovery);
     dsc_data->ref = (*env)->NewGlobalRef(env, object);
@@ -96,6 +107,37 @@ JNICALL Java_ru_sudox_cobra_discovery_CobraDiscovery_close(JNIEnv *env, jclass c
 
 JNIEXPORT void
 JNICALL Java_ru_sudox_cobra_discovery_CobraDiscovery_destroy(JNIEnv *env, jclass class, jlong pointer) {
+    cobra_discovery_t *discovery = (cobra_discovery_t *) pointer;
+    free(cobra_discovery_get_data(discovery));
+    cobra_discovery_destroy(discovery);
+}
+
+JNIEXPORT jlong
+JNICALL Java_ru_sudox_cobra_discovery_finder_CobraDiscoveryInterfaceFinder_create(JNIEnv *env, jclass class,
+                                                                                  jlong loader_pointer) {
+
+    cobra_discovery_t *discovery = cobra_discovery_create();
+    finder_data *data = malloc(sizeof(finder_data));
+    data->loader_data = (jloader_data *) loader_pointer;
+    cobra_discovery_set_data(discovery, data);
+
+    return (jlong) discovery;
+}
+
+JNIEXPORT jint
+JNICALL Java_ru_sudox_cobra_discovery_finder_CobraDiscoveryInterfaceFinder_find(JNIEnv *env, jobject object,
+                                                                                jlong pointer) {
+    cobra_discovery_t *discovery = (cobra_discovery_t *) pointer;
+    finder_data *data = cobra_discovery_get_data(discovery);
+    data->ref = (*env)->NewLocalRef(env, object);
+    data->env = env;
+
+    return cobra_discovery_get_addresses(discovery, discovery_on_address_found);
+}
+
+JNIEXPORT void
+JNICALL Java_ru_sudox_cobra_discovery_finder_CobraDiscoveryInterfaceFinder_destroy(JNIEnv *env, jclass class,
+                                                                                   jlong pointer) {
     cobra_discovery_t *discovery = (cobra_discovery_t *) pointer;
     free(cobra_discovery_get_data(discovery));
     cobra_discovery_destroy(discovery);

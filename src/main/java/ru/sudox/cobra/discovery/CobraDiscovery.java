@@ -12,6 +12,10 @@ public final class CobraDiscovery {
         this.pointer = create(CobraLoader.getPointer());
     }
 
+    static {
+        CobraLoader.loadInternal();
+    }
+
     @SuppressWarnings("unused")
     private void onFound(String host) {
         if (listener != null) {

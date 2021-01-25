@@ -7,6 +7,7 @@ struct jloader_data {
     jclass socket_class;
     jmethodID on_discovery_found_method_id;
     jmethodID on_discovery_close_method_id;
+    jmethodID on_discovery_address_found_method_id;
     jmethodID socket_serverside_constructor_id;
     jmethodID on_server_connection_method_id;
     jmethodID on_server_close_method_id;
