@@ -4,7 +4,7 @@ import ru.sudox.cobra.environment.CobraEnvironment;
 
 public class CobraTest {
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) {
         CobraLoader.init(new CobraTestEnv());
 
         CobraDiscoveryInterfaceFinder finder = new CobraDiscoveryInterfaceFinder();
@@ -13,8 +13,6 @@ public class CobraTest {
         });
 
         finder.find();
-
-        Thread.sleep(50000);
     }
 }
 

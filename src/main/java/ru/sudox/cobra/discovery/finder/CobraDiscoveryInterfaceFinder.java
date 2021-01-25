@@ -16,7 +16,7 @@ public final class CobraDiscoveryInterfaceFinder {
         CobraLoader.loadInternal();
     }
 
-    public CobraDiscoveryError find() {
+    public synchronized CobraDiscoveryError find() {
         return CobraDiscoveryError.values()[find(pointer)];
     }
 
