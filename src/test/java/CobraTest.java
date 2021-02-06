@@ -9,6 +9,7 @@ import ru.sudox.cobra.server.CobraServerError;
 import ru.sudox.cobra.server.CobraServerListener;
 import ru.sudox.cobra.socket.CobraSocket;
 import ru.sudox.cobra.socket.CobraSocketError;
+import ru.sudox.cobra.socket.CobraSocketListener;
 
 import java.nio.ByteBuffer;
 
@@ -17,20 +18,30 @@ public class CobraTest {
     public static void main(String[] args) throws InterruptedException {
         CobraLoader.init(new CobraTestEnv());
 
-        CobraDiscovery discovery = new CobraDiscovery();
-        discovery.setListener(new CobraDiscoveryListener() {
+        CobraSocket socket = new CobraSocket(32);
+        socket.setListener(new CobraSocketListener() {
             @Override
-            public void onFound(@NotNull CobraDiscovery discovery, @NotNull String host) {
-                System.out.println(host);
+            public void onConnect(@NotNull CobraSocket socket) {
+                socket.write(ByteBuffer.allocateDirect(4).put((byte) 1).put((byte) 2).put((byte) 3).put((byte) 4));
             }
 
             @Override
-            public void onClose(@NotNull CobraDiscovery discovery, @NotNull CobraDiscoveryError error) {
+            public void onData(@NotNull CobraSocket socket, @NotNull ByteBuffer buffer) {
+
+            }
+
+            @Override
+            public void onClose(@NotNull CobraSocket socket, @NotNull CobraSocketError error) {
+                System.out.println(error);
+            }
+
+            @Override
+            public void onDrain(@NotNull CobraSocket socket) {
 
             }
         });
 
-        discovery.scan();
+        socket.connect("127.0.0.1", "5556");
         Thread.sleep(500000);
     }
 }

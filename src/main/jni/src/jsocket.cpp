@@ -1,5 +1,6 @@
 #include <jni.h>
 #include <cobra.h>
+#include <unordered_map>
 
 #include "jloader.hpp"
 #include "jsocket.hpp"
@@ -53,7 +54,11 @@ void on_socket_drain(cobra_socket_t *socket) {
 }
 
 void on_socket_write(cobra_socket_t *socket, uint8_t *data, uint64_t length, cobra_socket_err_t error) {
-//    free(data);
+    auto *bind_data = static_cast<sock_bind_data *>(cobra_socket_get_data(socket));
+    socket_attach_thread_if_need(bind_data);
+
+    bind_data->env->DeleteGlobalRef(bind_data->buffers_map.at(data));
+    bind_data->buffers_map.erase(data);
 }
 
 void init_cobra_socket(cobra_socket_t *socket, jloader_data *loader_data, JNIEnv *env) {
@@ -118,8 +123,13 @@ extern "C"
 JNIEXPORT jint
 JNICALL Java_ru_sudox_cobra_socket_CobraSocket_write(JNIEnv *env, jclass clazz, jlong pointer, jobject buffer) {
     auto *socket = reinterpret_cast<cobra_socket_t *>(pointer);
+    auto *bind_data = static_cast<sock_bind_data *>(cobra_socket_get_data(socket));
     auto *address = static_cast<uint8_t *>(env->GetDirectBufferAddress(buffer));
     int buffer_length = env->GetDirectBufferCapacity(buffer);
+
+    if (buffer_length > 0) {
+        bind_data->buffers_map.insert(std::pair<uint8_t *, jobject>(address, env->NewGlobalRef(buffer)));
+    }
 
     return cobra_socket_write(socket, address, buffer_length);
 }
