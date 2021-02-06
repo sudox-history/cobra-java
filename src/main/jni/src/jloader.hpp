@@ -1,5 +1,5 @@
-#ifndef COBRA_JAVA_JLOADER_H
-#define COBRA_JAVA_JLOADER_H
+#ifndef COBRA_JAVA_JLOADER_HPP
+#define COBRA_JAVA_JLOADER_HPP
 
 typedef struct jloader_data jloader_data;
 
@@ -18,4 +18,4 @@ struct jloader_data {
     JavaVM *vm;
 };
 
-#endif //COBRA_JAVA_JLOADER_H
+#endif //COBRA_JAVA_JLOADER_HPP

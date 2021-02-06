@@ -1,21 +1,19 @@
 cmake_minimum_required(VERSION 3.10)
-project(cobra-java C)
-
-set(CMAKE_C_STANDARD 11)
+project(cobra-java)
 
 # libcobra
 add_subdirectory(deps/libcobra)
 
 # bindings
 add_library(cobra_java SHARED
-        src/jsocket.c
-        src/jsocket.h
-        src/jserver.c
-        src/jserver.h
-        src/jloader.c
-        src/jloader.h
-        src/jdiscovery.c
-        src/jdiscovery.h
+        src/jsocket.cpp
+        src/jsocket.hpp
+        src/jserver.cpp
+        src/jserver.hpp
+        src/jloader.cpp
+        src/jloader.hpp
+        src/jdiscovery.cpp
+        src/jdiscovery.hpp
 )
 
 target_link_libraries(cobra_java cobra_a)

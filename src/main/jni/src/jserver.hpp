@@ -1,5 +1,5 @@
-#ifndef COBRA_JAVA_JSERVER_H
-#define COBRA_JAVA_JSERVER_H
+#ifndef COBRA_JAVA_JSERVER_HPP
+#define COBRA_JAVA_JSERVER_HPP
 
 typedef struct server_bindings_data srv_bind_data;
 
@@ -9,4 +9,4 @@ struct server_bindings_data {
     jloader_data *loader_data;
 };
 
-#endif //COBRA_JAVA_JSERVER_H
+#endif //COBRA_JAVA_JSERVER_HPP

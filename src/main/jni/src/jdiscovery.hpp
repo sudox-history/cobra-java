@@ -1,5 +1,5 @@
-#ifndef COBRA_JAVA_JDISCOVERY_H
-#define COBRA_JAVA_JDISCOVERY_H
+#ifndef COBRA_JAVA_JDISCOVERY_HPP
+#define COBRA_JAVA_JDISCOVERY_HPP
 
 typedef struct discovery_data_t disc_data;
 typedef struct discovery_data_finder_t finder_data;

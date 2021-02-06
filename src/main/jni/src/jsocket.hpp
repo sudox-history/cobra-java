@@ -1,5 +1,5 @@
-#ifndef COBRA_JAVA_JSOCKET_H
-#define COBRA_JAVA_JSOCKET_H
+#ifndef COBRA_JAVA_JSOCKET_HPP
+#define COBRA_JAVA_JSOCKET_HPP
 
 typedef struct socket_bindings_data sock_bind_data;
 
@@ -14,4 +14,4 @@ void init_cobra_socket(cobra_socket_t *socket, jloader_data *loader_data, JNIEnv
 
 void link_cobra_socket(JNIEnv *env, jobject object, sock_bind_data *bind_data, bool can_detach);
 
-#endif //COBRA_JAVA_JSOCKET_H
+#endif //COBRA_JAVA_JSOCKET_HPP
