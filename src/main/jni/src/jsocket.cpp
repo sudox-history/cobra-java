@@ -55,10 +55,13 @@ void on_socket_drain(cobra_socket_t *socket) {
 
 void on_socket_write(cobra_socket_t *socket, uint8_t *data, uint64_t length, cobra_socket_err_t error) {
     auto *bind_data = static_cast<sock_bind_data *>(cobra_socket_get_data(socket));
+    auto reference = bind_data->buffers_map.at(data);
     socket_attach_thread_if_need(bind_data);
 
-    bind_data->env->DeleteGlobalRef(bind_data->buffers_map.at(data));
-    bind_data->buffers_map.erase(data);
+    if (reference != nullptr) {
+        bind_data->env->DeleteGlobalRef(reference);
+        bind_data->buffers_map.erase(data);
+    }
 }
 
 void init_cobra_socket(cobra_socket_t *socket, jloader_data *loader_data, JNIEnv *env) {
