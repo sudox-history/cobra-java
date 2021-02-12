@@ -54,13 +54,17 @@ void on_socket_drain(cobra_socket_t *socket) {
 }
 
 void on_socket_write(cobra_socket_t *socket, uint8_t *data, uint64_t length, cobra_socket_err_t error) {
+    if (length == 0) {
+        return;
+    }
+
     auto *bind_data = static_cast<sock_bind_data *>(cobra_socket_get_data(socket));
-    auto reference = bind_data->buffers_map.at(data);
+    auto reference = bind_data->buffers_map.find(data);
     socket_attach_thread_if_need(bind_data);
 
-    if (reference != nullptr) {
-        bind_data->env->DeleteGlobalRef(reference);
-        bind_data->buffers_map.erase(data);
+    if (reference != bind_data->buffers_map.end()) {
+        bind_data->env->DeleteGlobalRef(reference->second);
+        bind_data->buffers_map.erase(reference);
     }
 }
 
